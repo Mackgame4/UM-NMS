@@ -1,5 +1,5 @@
 import socket
-from ..shared.encoder import HOST, PORT, decode_message, encode_message
+from shared.encoder import HOST, PORT, decode_message, encode_message
 
 def start_client():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
