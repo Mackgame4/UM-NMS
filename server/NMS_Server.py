@@ -1,4 +1,5 @@
 import socket
+import threading
 from shared.encoder import decode_message, encode_message
 
 class NMS_Server:
@@ -6,10 +7,10 @@ class NMS_Server:
         self.host = host
         self.port = port
         self.socket_tcp = None
-        self.socket_udp = None
         self.MaxConnected = 5
         self.connectedAgents = []
-    
+        self.agent_id = 0  # Initialize ID counter
+
     def start(self):
         self.socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket_tcp.bind((self.host, self.port))
@@ -20,19 +21,26 @@ class NMS_Server:
     def accept_connections(self):
         while True:
             conn, addr = self.socket_tcp.accept()
-            print("Connected to", addr)
-            self.connectedAgents.append(conn)
-            self.handle_connection(conn)
+            self.agent_id += 1  # Increment the ID for each new client
+            client_id = self.agent_id
+            print(f"Client {client_id} connected from {addr}")
+            self.connectedAgents.append((conn, client_id))
+            
+            # Start a new thread for each client
+            threading.Thread(target=self.handle_connection, args=(conn, client_id)).start()
 
-    def handle_connection(self, conn):
+    def handle_connection(self, conn, client_id):
+        conn.send(encode_message(f"Welcome, your client ID is {client_id}"))
         while True:
             data = conn.recv(1024)
             if not data:
+                print(f"Client {client_id} disconnected")
                 break
             message = decode_message(data)
-            print("Received:", message)
-            response = "Received: " + message
+            print(f"Received from Client {client_id}: {message}")
+            response = f"Received by Server: {message}"
             conn.send(encode_message(response))
+        conn.close()
 
     def close(self):
         self.socket_tcp.close()
