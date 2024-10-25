@@ -1,5 +1,4 @@
-HOST = '127.0.0.1'  # Localhost
-PORT = 65432        # Port to listen on (non-privileged ports are > 1023)
+MAX_BUFFER_SIZE = 1024
 
 def encode_message(message):
     """Encode a message to send over the network."""

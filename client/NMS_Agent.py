@@ -1,14 +1,14 @@
+### 
 # Some python package imports path
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+###
 import socket
-from shared.encoder import decode_message, encode_message
+from shared.encoder import MAX_BUFFER_SIZE, decode_message, encode_message
 
 class NMS_Agent:
     def __init__(self, host='127.0.0.1', port=8888):
-        self.id = 0
         self.host = host
         self.port = port
         self.socket_tcp = None
@@ -19,7 +19,7 @@ class NMS_Agent:
         print("Connected to", self.host, ":", self.port)
         
         # Receive the welcome message with client ID
-        data = self.socket_tcp.recv(1024)
+        data = self.socket_tcp.recv(MAX_BUFFER_SIZE)
         if data:
             welcome_message = decode_message(data)
             print(welcome_message)
@@ -32,7 +32,7 @@ class NMS_Agent:
             if message.lower() == "exit":
                 break
             self.socket_tcp.send(encode_message(message))
-            data = self.socket_tcp.recv(1024)
+            data = self.socket_tcp.recv(MAX_BUFFER_SIZE)
             if not data:
                 break
             response = decode_message(data)

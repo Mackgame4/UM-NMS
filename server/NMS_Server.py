@@ -1,11 +1,12 @@
+### 
 # Some python package imports path
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+###
 import socket
 import threading
-from shared.encoder import decode_message, encode_message
+from shared.encoder import MAX_BUFFER_SIZE, decode_message, encode_message
 
 class NMS_Server:
     def __init__(self, host='127.0.0.1', port=8888):
@@ -29,7 +30,7 @@ class NMS_Server:
             self.agent_id += 1  # Increment the ID for each new client
             client_id = self.agent_id
             print(f"Client {client_id} connected from {addr}")
-            self.connectedAgents.append((conn, client_id))
+            self.connectedAgents.append((conn, client_id)) # Store the connection and ID as a tuple
             
             # Start a new thread for each client
             threading.Thread(target=self.handle_connection, args=(conn, client_id)).start()
@@ -38,7 +39,7 @@ class NMS_Server:
         try:
             conn.send(encode_message(f"Welcome, your client ID is {client_id}"))
             while True:
-                data = conn.recv(1024)
+                data = conn.recv(MAX_BUFFER_SIZE)
                 if not data:
                     print(f"Client {client_id} disconnected")
                     break
