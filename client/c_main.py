@@ -1,4 +1,4 @@
-import NMS_Client
+import NMS_Agent
 
 if __name__ == "__main__":
-    NMS_Client.main()
+    NMS_Agent.main()
