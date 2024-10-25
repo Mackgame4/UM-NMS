@@ -1,5 +1,5 @@
 all: dev
 
 dev: 
-	@echo "Running..."
+	@echo "Running in development mode..."
 	@python main.py
