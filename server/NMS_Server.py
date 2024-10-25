@@ -1,32 +1,42 @@
 import socket
-from shared.encoder import HOST, PORT, decode_message, encode_message
+from shared.encoder import decode_message, encode_message
 
 class NMS_Server:
-    def __init__(self):
-        self.ip = ""
+    def __init__(self, host='127.0.0.1', port=8888):
+        self.host = host
+        self.port = port
+        self.socket_tcp = None
+        self.socket_udp = None
+        self.MaxConnected = 5
+        self.connectedAgents = []
     
-    def connect(self):
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server.bind((HOST, PORT))
-        self.server.listen(5)
-        self.client, self.addr = self.server.accept()
+    def start(self):
+        self.socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket_tcp.bind((self.host, self.port))
+        self.socket_tcp.listen(self.MaxConnected)
+        print("Server started on", self.host, ":", self.port)
+        self.accept_connections()
 
-    def receive_message(self):
-        return decode_message(self.client.recv(1024))
-    
-    def send_message(self, message):
-        self.client.send(encode_message(message))
+    def accept_connections(self):
+        while True:
+            conn, addr = self.socket_tcp.accept()
+            print("Connected to", addr)
+            self.connectedAgents.append(conn)
+            self.handle_connection(conn)
+
+    def handle_connection(self, conn):
+        while True:
+            data = conn.recv(1024)
+            if not data:
+                break
+            message = decode_message(data)
+            print("Received:", message)
+            response = "Received: " + message
+            conn.send(encode_message(response))
 
     def close(self):
-        self.client.close()
-        self.server.close()
-
-    def get_ip(self):
-        return self.ip
+        self.socket_tcp.close()
 
 def main():
     server = NMS_Server()
-    server.connect()
-    print(server.receive_message())
-    server.send_message("Hello, client!")
-    server.close()
+    server.start()
