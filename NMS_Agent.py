@@ -1,11 +1,5 @@
-### 
-# Some python package imports path
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-###
 import socket
-from shared.encoder import MAX_BUFFER_SIZE, decode_message, encode_message
+from encoder import MAX_BUFFER_SIZE, decode_message, encode_message
 
 class NMS_Agent:
     def __init__(self, host='127.0.0.1', port=8888):
@@ -44,3 +38,6 @@ class NMS_Agent:
 def main():
     agent = NMS_Agent()
     agent.start()
+
+if __name__ == "__main__":
+    main()
