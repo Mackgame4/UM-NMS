@@ -2,15 +2,14 @@ from colorama import Fore
 import subprocess
 import platform
 
-def open_new_terminal(module_name, function_name):
-    command = f"python -c \"from {module_name} import {function_name}; {function_name}()\""
+def open_new_terminal(command):
     system_name = platform.system()
     if system_name == "Windows":
         subprocess.run(f'start cmd /k "{command}"', shell=True) # Windows: use 'start' to open a new command prompt
     elif system_name == "Linux":
         subprocess.run(f'gnome-terminal -- bash -c "{command}; exec bash"', shell=True) # Linux: use 'gnome-terminal' or 'xterm'
     elif system_name == "Darwin":
-        subprocess.run(['osascript', '-e', f'tell application "Terminal" to do script "{command}"']) # macOS: use osascript to run command in Terminal
+        subprocess.run(f'osascript -e \'tell application "Terminal" to do script "{command}"\'', shell=True) # macOS: use osascript to run command in Terminal
     else:
         print(Fore.RED + "Unsupported OS." + Fore.RESET)
 
@@ -26,10 +25,12 @@ def main():
             print(Fore.RED + "Exiting...\n" + Fore.RESET)
         elif option == 1:
             print(Fore.GREEN + "Starting Server...\n" + Fore.RESET)
-            open_new_terminal("NMS_Server", "main") # Open a new terminal to run NMS_Server.main()
+            command = "python NMS_Server.py"
+            open_new_terminal(command)
         elif option == 2:
             print(Fore.GREEN + "Starting Client...\n" + Fore.RESET)
-            open_new_terminal("NMS_Agent", "main") # Open a new terminal to run NMS_Agent.main()
+            command = "python NMS_Agent.py"
+            open_new_terminal(command)
         else:
             print(Fore.RED + "Invalid option. Try again.\n" + Fore.RESET)
 
