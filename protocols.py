@@ -10,10 +10,10 @@ TASK_RESULT_COMMAND = "task_result"
 
 # NetTask (utilizando UDP) para a comunicação de tarefas e a coleta contínua de métricas
 class NetTask:
-    def __init__(self, host='127.0.0.1', port=8888):
+    def __init__(self, host, port):
         self.host = host
         self.port = port
-        self.socket_udp = None
+        self.socket_udp = socket.socket()
         self.connectedAgents = []
         self.agent_counter = 0
 

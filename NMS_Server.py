@@ -24,27 +24,28 @@ class NMS_Server:
 
     # NetTask
     def start_net_task(self):
-        self.net_task.socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.net_task.socket_udp.bind((self.net_task.host, self.net_task.port))
-        print(Fore.GREEN + f"NetTask Server started at {self.net_task.host}:{self.net_task.port}" + Fore.RESET)
+        net_task = self.net_task
+        net_task.socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        net_task.socket_udp.bind((net_task.host, net_task.port))
+        print(Fore.GREEN + f"NetTask Server started at {net_task.host}:{net_task.port}" + Fore.RESET)
 
         while True:
-            data, addr = self.net_task.socket_udp.recvfrom(MAX_BUFFER_SIZE)
+            data, addr = net_task.socket_udp.recvfrom(MAX_BUFFER_SIZE)
             message = decode_message(data)
 
             if message == AGENT_REGISTER_COMMAND:
-                self.net_task.agent_counter += 1
-                self.net_task.connectedAgents.append((addr, self.net_task.agent_counter))
+                net_task.agent_counter += 1
+                net_task.connectedAgents.append((addr, net_task.agent_counter))
                 # TODO: check if the agent is already connected, if so, update the agent's address so it can reconnect if it goes offline and comes back online
                 # This will only work in a emulated environment, in local host all agents will have the same address but different ports
-                self.net_task.socket_udp.sendto(encode_message(str(self.net_task.agent_counter)), addr)
-                print(Fore.YELLOW + f"Agent {self.net_task.agent_counter} connected at {addr}" + Fore.RESET)
+                net_task.socket_udp.sendto(encode_message(str(net_task.agent_counter)), addr)
+                print(Fore.YELLOW + f"Agent {net_task.agent_counter} connected at {addr}" + Fore.RESET)
                 # After agent connected and registed, send a task request to the agent
                 task_request = "ping www.google.com" # TODO: Implement task queue
-                self.net_task.socket_udp.sendto(encode_message(TASK_REQUEST_COMMAND + f": {task_request}"), addr)
+                net_task.socket_udp.sendto(encode_message(TASK_REQUEST_COMMAND + f": {task_request}"), addr)
 
             elif message.startswith(TASK_RESULT_COMMAND):
-                agent_id = self.net_task.get_agent_id(addr)
+                agent_id = net_task.get_agent_id(addr)
                 result = message[len(TASK_RESULT_COMMAND) + 1:].strip()
                 print(Fore.YELLOW + f"Received task result from Agent {agent_id}: {result}" + Fore.RESET)
 
