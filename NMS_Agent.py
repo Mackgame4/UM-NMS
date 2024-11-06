@@ -1,43 +1,15 @@
-import socket
-from encoder import MAX_BUFFER_SIZE, decode_message, encode_message
+from protocols import MAX_BUFFER_SIZE, NetTask as NT, AlertFlow as AF
 
 class NMS_Agent:
-    def __init__(self, host='127.0.0.1', port=8888):
-        self.host = host
-        self.port = port
-        self.socket_tcp = None
-
-    def start(self):
-        self.socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket_tcp.connect((self.host, self.port))
-        print("Connected to", self.host, ":", self.port)
-        
-        # Receive the welcome message with client ID
-        data = self.socket_tcp.recv(MAX_BUFFER_SIZE)
-        if data:
-            welcome_message = decode_message(data)
-            print(welcome_message)
-
-        self.handle_connection()
-
-    def handle_connection(self):
-        while True:
-            message = input("Message: ")
-            if message.lower() == "exit":
-                break
-            self.socket_tcp.send(encode_message(message))
-            data = self.socket_tcp.recv(MAX_BUFFER_SIZE)
-            if not data:
-                break
-            response = decode_message(data)
-            print("Server responded:", response)
-            
-    def close(self):
-        self.socket_tcp.close()
+    def __init__(self, shost='127.0.0.1', sport=8888):
+        self.shost = shost # Server host to connect to
+        self.sport = sport # Server port to connect to
+        self.alert_flow = AF(shost, sport)
+        #self.net_task = NT()
 
 def main():
     agent = NMS_Agent()
-    agent.start()
+    agent.alert_flow.c_start()
 
 if __name__ == "__main__":
     main()
