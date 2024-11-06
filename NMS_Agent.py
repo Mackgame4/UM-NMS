@@ -1,11 +1,14 @@
 from protocols import MAX_BUFFER_SIZE, NetTask as NT, AlertFlow as AF
 
 class NMS_Agent:
-    def __init__(self, shost='127.0.0.1', sport=8888):
-        self.shost = shost # Server host to connect to
-        self.sport = sport # Server port to connect to
-        self.alert_flow = AF(shost, sport)
+    def __init__(self, host='127.0.0.1', port=8888):
+        self.alert_flow = AF(host, port)
         #self.net_task = NT()
+    
+    def run_task(self, task):
+        # Receive task via NetTask
+        print(f"Running task: {task}")
+        # Run task
 
 def main():
     agent = NMS_Agent()
