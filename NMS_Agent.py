@@ -16,15 +16,15 @@ def main():
     agent = NMS_Agent()
 
     # Create threads for each protocol
-    alert_thread = threading.Thread(target=agent.run_alert_flow)
+    #alert_thread = threading.Thread(target=agent.run_alert_flow)
     net_task_thread = threading.Thread(target=agent.run_net_task)
 
     # Start both threads
-    alert_thread.start()
+    #alert_thread.start()
     net_task_thread.start()
 
     # Optionally, join threads if you want the main program to wait for them to finish
-    alert_thread.join()
+    #alert_thread.join()
     net_task_thread.join()
 
 if __name__ == "__main__":

@@ -14,8 +14,13 @@ class NetTask:
         self.socket_udp = None
         self.MaxConnected = 5
         self.connectedAgents = []
-        self.agent_id = 0
-        self.agent_tasks = {}
+        self.agent_counter = 0
+
+    def get_agent_id(self, addr):
+        for agent in self.connectedAgents:
+            if agent[0] == addr:
+                return agent[1]
+        return None
 
     # Server side protocol
     def s_start(self):
@@ -25,12 +30,22 @@ class NetTask:
         while True:
             data, addr = self.socket_udp.recvfrom(MAX_BUFFER_SIZE)
             message = decode_message(data)
-            print(f"Received from {addr}: {message}")
+            print(f"Received from {addr}, {self.get_agent_id(addr)}: {message}")
+            if message == "register_agent":
+                self.agent_counter += 1
+                self.connectedAgents.append((addr, self.agent_counter))
+                self.socket_udp.sendto(encode_message(str(self.agent_counter)), addr)
+            print(f"Connected agents: {self.connectedAgents}")
 
     # Client side protocol
     def c_start(self):
         self.socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         print(f"NetTask Client started at {self.host}:{self.port}")
+        # Send requests to the server to register the agent and receive the assigned agent_id
+        self.socket_udp.sendto(encode_message("register_agent"), (self.host, self.port))
+        data, addr = self.socket_udp.recvfrom(MAX_BUFFER_SIZE)
+        agent_id = decode_message(data)
+        print(f"Agent ID: {agent_id}")
         while True:
             message = input("Enter message: ")
             self.socket_udp.sendto(encode_message(message), (self.host, self.port))
