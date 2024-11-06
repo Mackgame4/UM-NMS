@@ -10,9 +10,17 @@ class NMS_Agent:
         self.alert_flow = AF(host, port)
         self.net_task = NT(host, port)
 
+    def run_task(self, task):
+        # Execute the task
+        result = subprocess.run(task.split(), capture_output=True)
+        print(Fore.CYAN + f"Task result: {result.stdout.decode()}" + Fore.RESET)
+        return result.stdout.decode()
+
+    # AlertFlow
     def start_alert_flow(self):
         self.alert_flow.c_start()
 
+    # NetTask
     def start_net_task(self):
         self.net_task.socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         print(Fore.GREEN + f"NetTask Client connected at {self.net_task.host}:{self.net_task.port}" + Fore.RESET)
@@ -36,11 +44,6 @@ class NMS_Agent:
                 result = self.run_task(task)
                 self.net_task.socket_udp.sendto(encode_message(TASK_RESULT_COMMAND + f": {result}"), (self.net_task.host, self.net_task.port))
 
-    def run_task(self, task):
-        # Execute the task
-        result = subprocess.run(task.split(), capture_output=True)
-        return result.stdout.decode()
-
 def main():
     agent = NMS_Agent()
 
@@ -52,9 +55,9 @@ def main():
     #alert_thread.start()
     net_task_thread.start()
 
-    # Optionally, join threads if you want the main program to wait for them to finish
+    # Join threads if you want the main program to wait for them to finish
     #alert_thread.join()
-    net_task_thread.join()
+    #net_task_thread.join()
 
 if __name__ == "__main__":
     main()

@@ -18,9 +18,11 @@ class NMS_Server:
             tasks = json.load(f)
             self.tasks_queue = tasks["tasks"]  # Get tasks from "tasks" key
 
+    # AlertFlow
     def start_alert_flow(self):
         self.alert_flow.s_start()
 
+    # NetTask
     def start_net_task(self):
         self.net_task.socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.net_task.socket_udp.bind((self.net_task.host, self.net_task.port))
@@ -33,13 +35,15 @@ class NMS_Server:
             if message == AGENT_REGISTER_COMMAND:
                 self.net_task.agent_counter += 1
                 self.net_task.connectedAgents.append((addr, self.net_task.agent_counter))
+                # TODO: check if the agent is already connected, if so, update the agent's address so it can reconnect if it goes offline and comes back online
+                # This will only work in a emulated environment, in local host all agents will have the same address but different ports
                 self.net_task.socket_udp.sendto(encode_message(str(self.net_task.agent_counter)), addr)
                 print(Fore.YELLOW + f"Agent {self.net_task.agent_counter} connected at {addr}" + Fore.RESET)
                 # After agent connected and registed, send a task request to the agent
                 task_request = "ping www.google.com" # TODO: Implement task queue
                 self.net_task.socket_udp.sendto(encode_message(TASK_REQUEST_COMMAND + f": {task_request}"), addr)
 
-            else:
+            elif message.startswith(TASK_RESULT_COMMAND):
                 agent_id = self.net_task.get_agent_id(addr)
                 result = message[len(TASK_RESULT_COMMAND) + 1:].strip()
                 print(Fore.YELLOW + f"Received task result from Agent {agent_id}: {result}" + Fore.RESET)
@@ -49,7 +53,7 @@ def main():
 
     # Create threads for each protocol
     #alert_thread = threading.Thread(target=server.run_alert_flow)
-    net_task_thread = threading.Thread(target=server.start_alert_flow)
+    net_task_thread = threading.Thread(target=server.start_net_task)
 
     # Start both threads
     #alert_thread.start()
@@ -57,7 +61,7 @@ def main():
 
     # Join threads if you want the main program to wait for them to finish
     #alert_thread.join()
-    net_task_thread.join()
+    #net_task_thread.join()
 
 if __name__ == "__main__":
     main()

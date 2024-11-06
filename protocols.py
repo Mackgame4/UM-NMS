@@ -8,7 +8,6 @@ AGENT_REGISTER_COMMAND = "register_agent"
 TASK_REQUEST_COMMAND = "request_task"
 TASK_RESULT_COMMAND = "task_result"
 
-# TODO: NetTask class
 # NetTask (utilizando UDP) para a comunicação de tarefas e a coleta contínua de métricas
 class NetTask:
     def __init__(self, host='127.0.0.1', port=8888):
