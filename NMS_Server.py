@@ -11,6 +11,7 @@ class NMS_Server:
         self.net_task = NT(host, port)
         self.tasks_queue = []
 
+    # Class methods (Server-side)
     # Read tasks from a JSON file
     def read_tasks_from_file(self, filename):
         path = f"data/{filename}"
@@ -18,11 +19,20 @@ class NMS_Server:
             tasks = json.load(f)
             self.tasks_queue = tasks["tasks"]  # Get tasks from "tasks" key
 
-    # AlertFlow
+    # AlertFlow methods (Server-side)
+    # TODO: Implement the AlertFlow server-side protocol
     def start_alert_flow(self):
-        self.alert_flow.s_start()
+        alert_flow = self.alert_flow
+        alert_flow.socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        alert_flow.socket_tcp.bind((alert_flow.host, alert_flow.port))
+        alert_flow.socket_tcp.listen(5)
+        print(Fore.GREEN + f"AlertFlow Server started at {alert_flow.host}:{alert_flow.port}" + Fore.RESET)
+        #while True:
+            #conn, addr = alert_flow.socket_tcp.accept()
+            #print(f"Connected by {addr}")
+            #threading.Thread(target=alert_flow.handle_client, args=(conn, addr)).start()
 
-    # NetTask
+    # NetTask methods (Server-side)
     def start_net_task(self):
         net_task = self.net_task
         net_task.socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -51,15 +61,12 @@ class NMS_Server:
 
 def main():
     server = NMS_Server()
-
     # Create threads for each protocol
-    #alert_thread = threading.Thread(target=server.run_alert_flow)
+    alert_thread = threading.Thread(target=server.start_alert_flow)
     net_task_thread = threading.Thread(target=server.start_net_task)
-
     # Start both threads
-    #alert_thread.start()
+    alert_thread.start()
     net_task_thread.start()
-
     # Join threads if you want the main program to wait for them to finish
     #alert_thread.join()
     #net_task_thread.join()

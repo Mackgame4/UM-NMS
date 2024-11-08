@@ -28,19 +28,9 @@ class AlertFlow:
     def __init__(self, host='127.0.0.1', port=8888):
         self.host = host
         self.port = port
-        self.socket_tcp = None
+        self.socket_tcp = socket.socket()
 
-    # Server side protocol
-    def s_start(self):
-        self.socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket_tcp.bind((self.host, self.port))
-        self.socket_tcp.listen(5)
-        print(f"AlertFlow Server started at {self.host}:{self.port}")
-        while True:
-            conn, addr = self.socket_tcp.accept()
-            print(f"Connected by {addr}")
-            threading.Thread(target=self.handle_client, args=(conn, addr)).start()
-
+    """
     def handle_client(self, conn, addr):
         while True:
             data = conn.recv(MAX_BUFFER_SIZE)
@@ -50,14 +40,4 @@ class AlertFlow:
             print(f"Received from {addr}: {message}")
             conn.send(encode_message(f"Echo: {message}"))
         conn.close()
-
-    # Client side protocol
-    def c_start(self):
-        self.socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print(f"AlertFlow Client started at {self.host}:{self.port}")
-        self.socket_tcp.connect((self.host, self.port))
-        while True:
-            message = input("Enter message: ")
-            self.socket_tcp.send(encode_message(message))
-            data = self.socket_tcp.recv(MAX_BUFFER_SIZE)
-            print(f"Received: {data}")
+    """
