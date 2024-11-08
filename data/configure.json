@@ -4,6 +4,7 @@
         "frequency": 20,
         "devices": [{
             "device_id": "r1",
+            "device_addr": "0.0.0.0",
             "device_metrics": {
                 "cpu_usage": true,
                 "ram_usage": true,

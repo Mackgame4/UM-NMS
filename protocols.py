@@ -1,10 +1,9 @@
 import socket
-import threading
-from encoder import decode_message, encode_message
 
 # Export variables
 MAX_BUFFER_SIZE = 2048
 AGENT_REGISTER_COMMAND = "register_agent"
+AGENT_READY_COMMAND = "agent_ready"
 TASK_REQUEST_COMMAND = "request_task"
 TASK_RESULT_COMMAND = "task_result"
 
@@ -38,15 +37,3 @@ class AlertFlow:
         self.host = host
         self.port = port
         self.socket_tcp = socket.socket()
-
-    """
-    def handle_client(self, conn, addr):
-        while True:
-            data = conn.recv(MAX_BUFFER_SIZE)
-            if not data:
-                break
-            message = decode_message(data)
-            print(f"Received from {addr}: {message}")
-            conn.send(encode_message(f"Echo: {message}"))
-        conn.close()
-    """
