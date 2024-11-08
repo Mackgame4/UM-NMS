@@ -1,9 +1,12 @@
 from protocols import MAX_BUFFER_SIZE, AGENT_REGISTER_COMMAND, TASK_REQUEST_COMMAND, TASK_RESULT_COMMAND, NetTask as NT, AlertFlow as AF
 from encoder import decode_message, encode_message
 from colorama import Fore
+from Task import Task, Device
 import socket
 import threading
 import json
+
+TASKS_FILENAME = "tasks.json"
 
 class NMS_Server:
     def __init__(self, host='127.0.0.1', port=8888):
@@ -17,7 +20,24 @@ class NMS_Server:
         path = f"data/{filename}"
         with open(path, "r") as f:
             tasks = json.load(f)
-            self.tasks_queue = tasks["tasks"]  # Get tasks from "tasks" key
+            return tasks["tasks"] # Get tasks from "tasks" key
+        
+    def parse_tasks(self):
+        tasks = self.read_tasks_from_file(TASKS_FILENAME)
+        new_task = Task()
+        for task in tasks:
+            new_task.task_id = task["task_id"]
+            new_task.frequency = task["frequency"]
+            new_task.devices = []
+            task_devices = task["devices"]
+            for device in task_devices:
+                new_device = Device()
+                new_device.device_id = device["device_id"]
+                new_device.device_metrics = device["device_metrics"]
+                new_device.link_metrics = device["link_metrics"]
+                new_task.devices.append(new_device)
+            new_task.alertflow_conditions = task["alertflow_conditions"]
+            self.tasks_queue.append(new_task)
 
     # AlertFlow methods (Server-side)
     # TODO: Implement the AlertFlow server-side protocol

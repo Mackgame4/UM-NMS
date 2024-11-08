@@ -15,13 +15,22 @@ class NetTask:
         self.port = port
         self.socket_udp = socket.socket()
         self.connectedAgents = []
-        self.agent_counter = 0
+        self.agent_counter = 0 # Only for used for Agent ID assignment in the server-side
 
     def get_agent_id(self, addr):
         for agent in self.connectedAgents:
             if agent[0] == addr:
                 return agent[1]
         return None
+    
+    def get_agent_addr(self, agent_id):
+        for agent in self.connectedAgents:
+            if agent[1] == agent_id:
+                return agent[0]
+        return None
+    
+    def get_connected_agents(self):
+        return self.connectedAgents
 
 # AlertFlow (utilizando TCP) para notificação de alterações críticas no estado dos dispositivos de rede.
 class AlertFlow:
