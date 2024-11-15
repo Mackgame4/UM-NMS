@@ -53,6 +53,8 @@ class NMS_Agent:
                 # Wait for result and send it back to the server
                 result = self.run_task(task)
                 net_task.socket_udp.sendto(encode_message(TASK_RESULT_COMMAND + f": {result}"), (net_task.host, net_task.port))
+                # After sending the result, send a message to the server to indicate that the agent is ready to receive tasks
+                net_task.socket_udp.sendto(encode_message(AGENT_READY_COMMAND), (net_task.host, net_task.port))
 
 def main(args):
     agent = NMS_Agent()
