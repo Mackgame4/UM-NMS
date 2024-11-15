@@ -79,26 +79,11 @@ class NMS_Server:
                 agent_id = net_task.get_agent_id(addr)
                 self.ready_agents.append(agent_id)
                 print(Fore.YELLOW + f"Agent {agent_id} is ready to receive tasks" + Fore.RESET)
-                self.send_task(net_task, agent_id)
 
             elif message.startswith(TASK_RESULT_COMMAND):
                 agent_id = net_task.get_agent_id(addr)
                 result = message[len(TASK_RESULT_COMMAND) + 1:].strip()
                 print(Fore.YELLOW + f"Received task result from Agent {agent_id}: {result}" + Fore.RESET)
-
-    def send_task(self, net_task, agent_id):
-        if len(self.tasks_queue) <= 0:
-            print(Fore.RED + "No tasks available" + Fore.RESET)
-            return
-        if len(self.ready_agents) <= 0:
-            print(Fore.RED + "No agents available" + Fore.RESET)
-            return
-        task = self.tasks_queue.pop(0)
-        # TODO: get task and interpret it as commands
-        agent_addr = net_task.get_agent_addr(agent_id)
-        net_task.socket_udp.sendto(encode_message(TASK_REQUEST_COMMAND + f": {task}"), agent_addr)
-        print(Fore.YELLOW + f"Sent task to Agent {agent_id}: {task}" + Fore.RESET)
-        self.ready_agents.remove(agent_id) # Remove the agent from the ready list
 
 def main(args):
     server = NMS_Server()
