@@ -15,6 +15,10 @@ class NMS_Server:
         self.task_manager = TaskManager()
         self.ready_agents = [] # When a task (started and agent not ready, its ocuppied) ends the agent returns the result and send a ready message again and its added to this list again
 
+    # Class methods (Server-side)
+    def agent_ready(self, agent_id):
+        self.ready_agents.append(agent_id)
+
     # AlertFlow methods (Server-side)
     # TODO: Implement the AlertFlow server-side protocol
     def start_alert_flow(self):
@@ -38,8 +42,7 @@ class NMS_Server:
             message = decode_message(data)
 
             if message == AGENT_REGISTER_COMMAND:
-                net_task.agent_counter += 1
-                net_task.connectedAgents.append((addr, net_task.agent_counter))
+                net_task.register_agent(addr)
                 # TODO: check if the agent is already connected, if so, update the agent's address so it can reconnect if it goes offline and comes back online
                 # This will only work in a emulated environment, in local host all agents will have the same address but different ports
                 net_task.socket_udp.sendto(encode_message(str(net_task.agent_counter)), addr)
@@ -47,7 +50,7 @@ class NMS_Server:
 
             elif message == AGENT_READY_COMMAND:
                 agent_id = net_task.get_agent_id(addr)
-                self.ready_agents.append(agent_id)
+                self.agent_ready(agent_id)
                 print(Fore.YELLOW + f"Agent {agent_id} is ready to receive tasks" + Fore.RESET)
 
             elif message.startswith(TASK_RESULT_COMMAND):
