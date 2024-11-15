@@ -67,8 +67,8 @@ def main(args):
     alert_thread.start()
     net_task_thread.start()
     # Join threads if you want the main program to wait for them to finish
-    #alert_thread.join()
-    #net_task_thread.join()
+    alert_thread.join()
+    net_task_thread.join()
 
 if __name__ == "__main__":
     args = sys.argv[1:]

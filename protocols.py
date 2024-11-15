@@ -16,6 +16,11 @@ class NetTask:
         self.connectedAgents = []
         self.agent_counter = 0 # Only for used for Agent ID assignment in the server-side
 
+    def register_agent(self, addr):
+        self.agent_counter += 1
+        self.connectedAgents.append((addr, self.agent_counter))
+        return self.agent_counter
+
     def get_agent_id(self, addr):
         for agent in self.connectedAgents:
             if agent[0] == addr:
