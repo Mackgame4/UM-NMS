@@ -74,8 +74,8 @@ def main(args):
     net_task_thread = threading.Thread(target=server.start_net_task)
     alert_thread.start()
     net_task_thread.start()
-    alert_thread.join()
-    net_task_thread.join()
+    #alert_thread.join()
+    #net_task_thread.join()
 
 if __name__ == "__main__":
     args = sys.argv[1:]
