@@ -51,10 +51,12 @@ class NMS_Agent:
                 cpu_usage = self.get_cpu_usage()
                 if cpu_usage is not None:
                     notify("info", f"CPU Usage: {cpu_usage}%")
+            # Get ram usage if device['device_metrics']['ram'] is True
             if device['device_metrics']['ram_usage']:
                 ram_usage = self.get_ram_usage()
                 if ram_usage is not None:
                     notify("info", f"RAM Usage: {ram_usage}%")
+            # Get interface stats if device['device_metrics']['interface_stats'] is not empty
             for eth in device['device_metrics']['interface_stats']:
                 eth_stats = self.get_interface_stats()
                 if eth_stats is not None:
@@ -65,7 +67,6 @@ class NMS_Agent:
                         notify("info", f"Interface {eth_name}: Bytes sent: {eth_bytes_sent}, Bytes received: {eth_bytes_recv}")
                     else:
                         notify("warning", f"Interface {eth} not found in network interfaces.")
-
             # Sleep for 1 seconds
             time.sleep(1)
 
