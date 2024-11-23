@@ -6,6 +6,8 @@ else
 endif
 
 MAIN = main.py
+IP = 127.0.0.1
+PORT = 8888
 
 all: dev
 
@@ -27,61 +29,61 @@ endif
 client:
 ifeq ($(OS_DETECTED), Linux)
 	@echo "Detected OS: Linux"
-	@python3 $(MAIN) client
+	@python3 $(MAIN) client $(IP) $(PORT)
 else ifeq ($(OS_DETECTED), Darwin)
 	@echo "Detected OS: macOS"
-	@python $(MAIN) client
+	@python $(MAIN) client $(IP) $(PORT) 
 else ifeq ($(OS_DETECTED), Windows)
 	@echo "Detected OS: Windows"
-	@python $(MAIN) client
+	@python $(MAIN) client $(IP) $(PORT)
 else
 	@echo "Unknown OS: $(OS_DETECTED)"
-	@python3 $(MAIN) client
+	@python3 $(MAIN) client $(IP) $(PORT)
 endif
 
 server:
 ifeq ($(OS_DETECTED), Linux)
 	@echo "Detected OS: Linux"
-	@python3 $(MAIN) server
+	@python3 $(MAIN) server $(IP) $(PORT)
 else ifeq ($(OS_DETECTED), Darwin)
 	@echo "Detected OS: macOS"
-	@python $(MAIN) server
+	@python $(MAIN) server $(IP) $(PORT)
 else ifeq ($(OS_DETECTED), Windows)
 	@echo "Detected OS: Windows"
-	@python $(MAIN) server
+	@python $(MAIN) server $(IP) $(PORT)
 else
 	@echo "Unknown OS: $(OS_DETECTED)"
-	@python3 $(MAIN) server
+	@python3 $(MAIN) server $(IP) $(PORT)
 endif
 
 dev-client:
 ifeq ($(OS_DETECTED), Linux)
 	@echo "Detected OS: Linux"
-	@python3 $(MAIN) dev-client
+	@python3 $(MAIN) dev-client $(IP) $(PORT)
 else ifeq ($(OS_DETECTED), Darwin)
 	@echo "Detected OS: macOS"
-	@python $(MAIN) dev-client
+	@python $(MAIN) dev-client $(IP) $(PORT)
 else ifeq ($(OS_DETECTED), Windows)
 	@echo "Detected OS: Windows"
-	@python $(MAIN) dev-client
+	@python $(MAIN) dev-client $(IP) $(PORT)
 else
 	@echo "Unknown OS: $(OS_DETECTED)"
-	@python3 $(MAIN) dev-client
+	@python3 $(MAIN) dev-client $(IP) $(PORT)
 endif
 
 dev-server:
 ifeq ($(OS_DETECTED), Linux)
 	@echo "Detected OS: Linux"
-	@python3 $(MAIN) dev-server
+	@python3 $(MAIN) dev-server $(IP) $(PORT)
 else ifeq ($(OS_DETECTED), Darwin)
 	@echo "Detected OS: macOS"
-	@python $(MAIN) dev-server
+	@python $(MAIN) dev-server $(IP) $(PORT)
 else ifeq ($(OS_DETECTED), Windows)
 	@echo "Detected OS: Windows"
-	@python $(MAIN) dev-server
+	@python $(MAIN) dev-server $(IP) $(PORT)
 else
 	@echo "Unknown OS: $(OS_DETECTED)"
-	@python3 $(MAIN) dev-server
+	@python3 $(MAIN) dev-server $(IP) $(PORT)
 endif
 
 relatorio: relatorio_build

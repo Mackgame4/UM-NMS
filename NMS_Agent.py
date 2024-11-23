@@ -1,7 +1,6 @@
-from ast import arg
 from protocols import MAX_BUFFER_SIZE, AGENT_REGISTER_COMMAND, TASK_REQUEST_COMMAND, TASK_RESULT_COMMAND, AGENT_READY_COMMAND, NetTask as NT, AlertFlow as AF
 from encoder import decode_message, encode_message
-from colorama import Fore
+from notify import notify
 import socket
 import threading
 import subprocess
@@ -12,31 +11,30 @@ class NMS_Agent:
         self.alert_flow = AF(host, port)
         self.net_task = NT(host, port)
 
-    # Class methods (Client-side)
+    ### Class methods (Client-side) ###
     def run_task(self, task):
         result = subprocess.run(task.split(), capture_output=True)
-        #print(Fore.CYAN + f"Task result: {result.stdout.decode()}" + Fore.RESET)
+        notify("debug", f"Task result: {result.stdout.decode()}")
         return result.stdout.decode()
 
-    # AlertFlow methods (Client-side)
-    # TODO: Implement the AlertFlow client-side protocol
+    ### AlertFlow methods (Client-side) ###
     def start_alert_flow(self):
         alert_flow = self.alert_flow
         alert_flow.socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print(Fore.GREEN + f"AlertFlow Client connected at {alert_flow.host}:{alert_flow.port}" + Fore.RESET)
+        notify("info", f"AlertFlow Client connected at {alert_flow.host}:{alert_flow.port}")
         alert_flow.socket_tcp.connect((alert_flow.host, alert_flow.port))
 
-    # NetTask methods (Client-side)
+    ### NetTask methods (Client-side) ###
     def start_net_task(self):
         net_task = self.net_task
         net_task.socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        print(Fore.GREEN + f"NetTask Client connected at {net_task.host}:{net_task.port}" + Fore.RESET)
+        notify("info", f"NetTask Client connected at {net_task.host}:{net_task.port}")
 
         # Send requests to the server to register the agent and receive the assigned agent_id
         net_task.socket_udp.sendto(encode_message(AGENT_REGISTER_COMMAND), (net_task.host, net_task.port))
         data, _ = net_task.socket_udp.recvfrom(MAX_BUFFER_SIZE)
         agent_id = decode_message(data)
-        print(Fore.YELLOW + f"Assigned Agent ID: {agent_id}" + Fore.RESET)
+        notify("warning", f"Assigned Agent ID: {agent_id}")
 
         # Send a message to the server to indicate that the agent is ready to receive tasks
         net_task.socket_udp.sendto(encode_message(AGENT_READY_COMMAND), (net_task.host, net_task.port))
@@ -48,25 +46,23 @@ class NMS_Agent:
 
             if message.startswith(TASK_REQUEST_COMMAND):
                 task = message[len(TASK_REQUEST_COMMAND) + 1:].strip()
-                print(Fore.YELLOW + f"Received task request from server: " + Fore.RESET + task)
+                notify("debug", f"Received task: {task}")
                 
                 # Wait for result and send it back to the server
                 result = self.run_task(task)
                 net_task.socket_udp.sendto(encode_message(TASK_RESULT_COMMAND + f": {result}"), (net_task.host, net_task.port))
 
+### Runnable Section ###
 def main(args):
     agent = NMS_Agent()
     if len(args) >= 2:
         host = args[0]
         port = int(args[1])
         agent = NMS_Agent(host, port)
-    # Create threads for each protocol
     alert_thread = threading.Thread(target=agent.start_alert_flow)
     net_task_thread = threading.Thread(target=agent.start_net_task)
-    # Start both threads
     alert_thread.start()
     net_task_thread.start()
-    # Join threads if you want the main program to wait for them to finish
     alert_thread.join()
     net_task_thread.join()
 
