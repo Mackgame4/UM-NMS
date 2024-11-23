@@ -1,37 +1,88 @@
+# Detect the operating system
+ifeq ($(OS), Windows_NT)
+	OS_DETECTED := Windows
+else
+	OS_DETECTED := $(shell uname -s)
+endif
+
+MAIN = main.py
+
 all: dev
 
-IP = 127.0.0.1
-PORT = 8888
+dev:
+ifeq ($(OS_DETECTED), Linux)
+	@echo "Detected OS: Linux"
+	@python3 $(MAIN)
+else ifeq ($(OS_DETECTED), Darwin)
+	@echo "Detected OS: macOS"
+	@python $(MAIN)
+else ifeq ($(OS_DETECTED), Windows)
+	@echo "Detected OS: Windows"
+	@python $(MAIN)
+else
+	@echo "Unknown OS: $(OS_DETECTED)"
+	@python3 $(MAIN)
+endif
 
-dev: 
-	@echo "Running in development mode..."
-	@python main.py
+client:
+ifeq ($(OS_DETECTED), Linux)
+	@echo "Detected OS: Linux"
+	@python3 $(MAIN) client
+else ifeq ($(OS_DETECTED), Darwin)
+	@echo "Detected OS: macOS"
+	@python $(MAIN) client
+else ifeq ($(OS_DETECTED), Windows)
+	@echo "Detected OS: Windows"
+	@python $(MAIN) client
+else
+	@echo "Unknown OS: $(OS_DETECTED)"
+	@python3 $(MAIN) client
+endif
+
+server:
+ifeq ($(OS_DETECTED), Linux)
+	@echo "Detected OS: Linux"
+	@python3 $(MAIN) server
+else ifeq ($(OS_DETECTED), Darwin)
+	@echo "Detected OS: macOS"
+	@python $(MAIN) server
+else ifeq ($(OS_DETECTED), Windows)
+	@echo "Detected OS: Windows"
+	@python $(MAIN) server
+else
+	@echo "Unknown OS: $(OS_DETECTED)"
+	@python3 $(MAIN) server
+endif
 
 dev-client:
-	@echo "Running in development mode with client..."
-	@python NMS_Agent.py
+ifeq ($(OS_DETECTED), Linux)
+	@echo "Detected OS: Linux"
+	@python3 $(MAIN) dev-client
+else ifeq ($(OS_DETECTED), Darwin)
+	@echo "Detected OS: macOS"
+	@python $(MAIN) dev-client
+else ifeq ($(OS_DETECTED), Windows)
+	@echo "Detected OS: Windows"
+	@python $(MAIN) dev-client
+else
+	@echo "Unknown OS: $(OS_DETECTED)"
+	@python3 $(MAIN) dev-client
+endif
 
 dev-server:
-	@echo "Running in development mode with server..."
-	@python NMS_Server.py
-
-# Windows commands
-win-client:
-	@echo "Running in client mode..."
-	@cmd /c start python NMS_Agent.py $(IP) $(PORT)
-
-win-server:
-	@echo "Running in server mode..."
-	@cmd /c start python NMS_Server.py $(IP) $(PORT)
-
-# Linux commands
-linux-client:
-	@echo "Running in development mode with client..."
-	@python3 NMS_Agent.py $(IP) $(PORT)
-
-linux-server:
-	@echo "Running in development mode with server..."
-	@python3 NMS_Server.py $(IP) $(PORT)
+ifeq ($(OS_DETECTED), Linux)
+	@echo "Detected OS: Linux"
+	@python3 $(MAIN) dev-server
+else ifeq ($(OS_DETECTED), Darwin)
+	@echo "Detected OS: macOS"
+	@python $(MAIN) dev-server
+else ifeq ($(OS_DETECTED), Windows)
+	@echo "Detected OS: Windows"
+	@python $(MAIN) dev-server
+else
+	@echo "Unknown OS: $(OS_DETECTED)"
+	@python3 $(MAIN) dev-server
+endif
 
 relatorio: relatorio_build
 
