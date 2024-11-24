@@ -75,26 +75,27 @@ class NMS_Agent:
                 alert_flow = self.alert_flow
                 for metric, value in result.items():
                     metric_threshold = task_device.get('alertflow_conditions', {}).get(metric, None)
-                    print("Debug: Checking", metric, value, metric_threshold)
+                    #print("Debug: Checking", metric, value, metric_threshold)
                     # check if value is an int, is is a dict interface_stats, dont check
-                    if not isinstance(value, dict):
-                        if value >= metric_threshold and metric == 'cpu_usage':
-                            alert_flow.socket_tcp.send(encode_message(metric, value))
-                        elif value >= metric_threshold and metric == 'ram_usage':
-                            alert_flow.socket_tcp.send(encode_message(metric, value))
-                        elif value >= metric_threshold and metric == 'packet_loss':
-                            alert_flow.socket_tcp.send(encode_message(metric, value))
-                        elif value >= metric_threshold and metric == 'jitter':
-                            alert_flow.socket_tcp.send(encode_message(metric, value))
-                    else:
-                        if metric == 'interface_stats':
-                            for eth, stats in value.items():
-                                eth_bytes_sent = stats['bytes_sent']
-                                eth_bytes_recv = stats['bytes_recv']
-                                if eth_bytes_sent >= metric_threshold:
-                                    alert_flow.socket_tcp.send(encode_message(f"{eth}_bytes_sent", eth_bytes_sent))
-                                if eth_bytes_recv >= metric_threshold:
-                                    alert_flow.socket_tcp.send(encode_message(f"{eth}_bytes_recv", eth_bytes_recv))
+                    if metric_threshold is not None:
+                        if not isinstance(value, dict):
+                            if value >= metric_threshold and metric == 'cpu_usage':
+                                alert_flow.socket_tcp.send(encode_message(metric, value))
+                            elif value >= metric_threshold and metric == 'ram_usage':
+                                alert_flow.socket_tcp.send(encode_message(metric, value))
+                            elif value >= metric_threshold and metric == 'packet_loss':
+                                alert_flow.socket_tcp.send(encode_message(metric, value))
+                            elif value >= metric_threshold and metric == 'jitter':
+                                alert_flow.socket_tcp.send(encode_message(metric, value))
+                        else:
+                            if metric == 'interface_stats':
+                                for eth, stats in value.items():
+                                    eth_bytes_sent = stats['bytes_sent']
+                                    eth_bytes_recv = stats['bytes_recv']
+                                    if eth_bytes_sent >= metric_threshold:
+                                        alert_flow.socket_tcp.send(encode_message(metric, str(int(eth_bytes_sent))))
+                                    if eth_bytes_recv >= metric_threshold:
+                                        alert_flow.socket_tcp.send(encode_message(metric, str(int(eth_bytes_recv))))
 
 ### Runnable Section ###
 def main(args):
