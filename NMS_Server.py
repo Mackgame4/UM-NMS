@@ -1,6 +1,6 @@
 from protocols import MAX_BUFFER_SIZE, AGENT_REGISTER_COMMAND, AGENT_RECEIVED_COMMAND, TASK_REQUEST_COMMAND, TASK_RESULT_COMMAND, AGENT_READY_COMMAND, NetTask as NT, AlertFlow as AF
 from encoder import decode_message, encode_message
-from notify import notify
+from notify import notify, notify_af
 from task import TaskManager
 import socket
 import threading
@@ -13,8 +13,6 @@ class NMS_Server:
         self.config_file = config_file
         self.task_manager = TaskManager()
 
-    ### Class methods (Server-side) ###
-
     ### AlertFlow methods (Server-side) ###
     def start_alert_flow(self):
         alert_flow = self.alert_flow
@@ -22,6 +20,19 @@ class NMS_Server:
         alert_flow.socket_tcp.bind((alert_flow.host, alert_flow.port))
         alert_flow.socket_tcp.listen(alert_flow.max_connections)
         notify("info", f"AlertFlow Server started at {alert_flow.host}:{alert_flow.port}")
+
+        while True:
+            conn, addr = alert_flow.socket_tcp.accept()
+            with conn:
+                notify("info", f"AlertFlow Client connected at {addr}")
+                while True:
+                    data = conn.recv(MAX_BUFFER_SIZE)
+                    if not data:
+                        break
+                    message = decode_message(data)
+                    metric_name = message.command
+                    metric_data = message.data
+                    notify_af("warning", f"{metric_name} condition got exceeded: {metric_data}")
 
     ### NetTask methods (Server-side) ###
     def start_net_task(self):

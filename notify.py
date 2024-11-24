@@ -18,3 +18,9 @@ def notify(type, message):
         print(Back.WHITE + "[MESSAGE]" + Back.RESET + " " + Fore.WHITE + message + Fore.RESET)
     else:
         print(message)
+
+def notify_nt(type, message):
+    notify(type, f"{Back.WHITE}[NetTask]{Back.RESET} {message}")
+
+def notify_af(type, message):
+    notify(type, f"{Back.WHITE}[AlertFlow]{Back.RESET} {message}")
