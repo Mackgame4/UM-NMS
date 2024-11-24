@@ -1,9 +1,10 @@
 {
-    "tasks": [{
+    "tasks": [
+    {
         "task_id": "task-001",
-        "frequency": 20,
+        "frequency": 1,
         "devices": [{
-            "device_addr": "127.0.0.1",
+            "device_addr": "10.0.7.10",
             "device_metrics": {
                 "cpu_usage": true,
                 "ram_usage": true,
@@ -13,30 +14,32 @@
                 "bandwidth": {
                     "tool": "iperf",
                     "role": "client",
-                    "server_address": "192.168.1.1",
+                    "server_address": "10.0.5.10",
                     "duration": 10,
                     "transport": "tcp",
-                    "frequency": 30
+                    "frequency": 1
                 },
                 "jitter": {
                     "tool": "iperf",
                     "role": "client",
-                    "server_address": "192.168.1.1",
+                    "server_address": "10.0.5.10",
+                    "transport": "udp",
                     "duration": 10,
-                    "frequency": 30
+                    "frequency": 1
                 },
                 "packet_loss": {
                     "tool": "iperf",
                     "role": "client",
-                    "server_address": "192.168.1.1",
+                    "server_address": "10.0.5.10",
+                    "transport": "udp",
                     "duration": 10,
-                    "frequency": 30
+                    "frequency": 1
                 },
                 "latency": {
                     "tool": "ping",
-                    "destination": "192.168.1.1",
+                    "destination": "10.0.0.10",
                     "packet_count": 5,
-                    "frequency": 15
+                    "frequency": 1
                 }
             },
             "alertflow_conditions": {
@@ -47,5 +50,32 @@
                 "jitter": 100
             }
         }]
-    }]
-}
+    },
+    {
+        "task_id": "task-002",
+        "frequency": 1,
+        "devices": [{
+            "device_addr": "10.0.5.10",
+            "device_metrics": {
+                "cpu_usage": true,
+                "ram_usage": true,
+                "interface_stats": ["Ethernet", "Wi-Fi", "eth0"]
+            },
+            "link_metrics": {
+                "jitter": {
+                    "tool": "iperf",
+                    "role": "server",
+                    "transport": "udp",
+                    "frequency": 1
+                }
+            },
+            "alertflow_conditions": {
+                "cpu_usage": 80,
+                "ram_usage": 90,
+                "interface_stats": 2000,
+                "packet_loss": 5,
+                "jitter": 100
+            }
+        }]
+    }
+]}

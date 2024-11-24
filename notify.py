@@ -1,5 +1,7 @@
 from colorama import Fore, Back
 
+DEBUG = True
+
 def notify(type, message):
     if type == 'info':
         print(Back.BLUE + "[INFO]" + Back.RESET + " " + Fore.BLUE + message + Fore.RESET)
@@ -10,7 +12,8 @@ def notify(type, message):
     elif type == 'success':
         print(Back.GREEN + "[SUCCESS]" + Back.RESET + " " + Fore.GREEN + message + Fore.RESET)
     elif type == 'debug':
-        print(Back.CYAN + "[DEBUG]" + Back.RESET + " " + Fore.CYAN + message + Fore.RESET)
+        if DEBUG:
+            print(Back.CYAN + "[DEBUG]" + Back.RESET + " " + Fore.CYAN + message + Fore.RESET)
     elif type == 'message':
         print(Back.WHITE + "[MESSAGE]" + Back.RESET + " " + Fore.WHITE + message + Fore.RESET)
     else:

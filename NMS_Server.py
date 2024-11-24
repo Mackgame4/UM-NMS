@@ -33,7 +33,7 @@ class NMS_Server:
         notify("info", f"NetTask Server started at {net_task.host}:{net_task.port}")
 
         task_manager.read_config_file(self.config_file)
-        #notify("debug", f"Tasks: {task_manager.tasks}")
+        notify("debug", f"Loaded Tasks: {task_manager.tasks}")
 
         while True:
             data, c_addr = net_task.socket_udp.recvfrom(MAX_BUFFER_SIZE)
@@ -46,7 +46,7 @@ class NMS_Server:
                     agent_id = net_task.register_agent(c_addr)
                 net_task.socket_udp.sendto(encode_message(AGENT_RECEIVED_COMMAND, agent_id), c_addr)
                 notify("success", f"Agent {agent_id} assigned at {c_addr}")
-                #notify("debug", f"Agents: {net_task.get_connected_agents()}")
+                notify("debug", f"Connected Agents: {net_task.get_connected_agents()}")
 
             # Server received agent ready to task: Check if there are tasks for it and send the task
             elif message.command == AGENT_READY_COMMAND:
@@ -60,7 +60,7 @@ class NMS_Server:
 
             elif message.command == TASK_RESULT_COMMAND:
                 result = message.data
-                notify("debug", f"Task result from Agent {agent_id}: {result}")
+                notify("success", f"Task result from Agent {agent_id}: {result}")
 
 ### Runnable Section ###
 def main(args):
@@ -70,12 +70,19 @@ def main(args):
         port = int(args[1])
         config_file = args[2]
         server = NMS_Server(host, port, config_file)
+    elif len(args) >= 2:
+        host = args[0]
+        port = int(args[1])
+        server = NMS_Server(host, port)
+    elif len(args) >= 1:
+        host = args[0]
+        server = NMS_Server(host)
     alert_thread = threading.Thread(target=server.start_alert_flow)
     net_task_thread = threading.Thread(target=server.start_net_task)
     alert_thread.start()
     net_task_thread.start()
-    #alert_thread.join()
-    #net_task_thread.join()
+    alert_thread.join()
+    net_task_thread.join()
 
 if __name__ == "__main__":
     args = sys.argv[1:]

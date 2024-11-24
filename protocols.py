@@ -45,8 +45,8 @@ class NetTask:
 
 # AlertFlow (utilizando TCP) para notificação de alterações críticas no estado dos dispositivos de rede.
 class AlertFlow:
-    def __init__(self, host='127.0.0.1', port=8888):
+    def __init__(self, host, port):
         self.host = host
         self.port = port
         self.socket_tcp = socket.socket()
-        self.max_connections = 5
+        self.max_connections = 5 # TODO: Implementar controlo de conexões

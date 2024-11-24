@@ -26,24 +26,26 @@ def install_dependencies():
 
 def open_terminal(file, args):
     platform = get_platform()
+    args = " ".join(args)
     if platform == "Windows":
-        subprocess.run(f'start cmd /k "python {file} {args[0]} {args[1]}"', shell=True)
+        subprocess.run(f'start cmd /k "python {file} {args}"', shell=True)
     elif platform == "Linux":
-        subprocess.run(f'gnome-terminal -- python3 {file} {args[0]} {args[1]}', shell=True)
+        subprocess.run(f'gnome-terminal -- python3 {file} {args}', shell=True)
     elif platform == "Darwin":
-        subprocess.run(f'open -a Terminal python3 {file} {args[0]} {args[1]}', shell=True)
+        subprocess.run(f'open -a Terminal python3 {file} {args}', shell=True)
     else:
         notify("error", "Unsupported platform.")
         exit()
 
 def run_command(command, args):
     platform = get_platform()
+    args = " ".join(args)
     if platform == "Windows":
-        os.system(f"python {command} {args[0]} {args[1]}")
+        os.system(f"python {command} {args}")
     elif platform == "Linux":
-        os.system(f"python3 {command} {args[0]} {args[1]}")
+        os.system(f"python3 {command} {args}")
     elif platform == "Darwin":
-        os.system(f"python3 {command} {args[0]} {args[1]}")
+        os.system(f"python3 {command} {args}")
     else:
         notify("error", "Unsupported platform.")
         exit()

@@ -30,16 +30,16 @@ endif
 client:
 ifeq ($(OS_DETECTED), Linux)
 	@echo "Detected OS: Linux"
-	@python3 $(MAIN) client $(IP) $(PORT) $(CONFIG)
+	@python3 $(MAIN) client $(IP) $(PORT)
 else ifeq ($(OS_DETECTED), Darwin)
 	@echo "Detected OS: macOS"
-	@python $(MAIN) client $(IP) $(PORT) $(CONFIG)
+	@python $(MAIN) client $(IP) $(PORT)
 else ifeq ($(OS_DETECTED), Windows)
 	@echo "Detected OS: Windows"
-	@python $(MAIN) client $(IP) $(PORT) $(CONFIG)
+	@python $(MAIN) client $(IP) $(PORT)
 else
 	@echo "Unknown OS: $(OS_DETECTED)"
-	@python3 $(MAIN) client $(IP) $(PORT) $(CONFIG)
+	@python3 $(MAIN) client $(IP) $(PORT)
 endif
 
 server:
@@ -60,16 +60,16 @@ endif
 dev-client:
 ifeq ($(OS_DETECTED), Linux)
 	@echo "Detected OS: Linux"
-	@python3 $(MAIN) dev-client $(IP) $(PORT) $(CONFIG)
+	@python3 $(MAIN) dev-client $(IP) $(PORT)
 else ifeq ($(OS_DETECTED), Darwin)
 	@echo "Detected OS: macOS"
-	@python $(MAIN) dev-client $(IP) $(PORT) $(CONFIG)
+	@python $(MAIN) dev-client $(IP) $(PORT)
 else ifeq ($(OS_DETECTED), Windows)
 	@echo "Detected OS: Windows"
-	@python $(MAIN) dev-client $(IP) $(PORT) $(CONFIG)
+	@python $(MAIN) dev-client $(IP) $(PORT)
 else
 	@echo "Unknown OS: $(OS_DETECTED)"
-	@python3 $(MAIN) dev-client $(IP) $(PORT) $(CONFIG)
+	@python3 $(MAIN) dev-client $(IP) $(PORT)
 endif
 
 dev-server:
