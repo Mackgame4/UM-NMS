@@ -80,22 +80,22 @@ class NMS_Agent:
                     if metric_threshold is not None:
                         if not isinstance(value, dict):
                             if value >= metric_threshold and metric == 'cpu_usage':
-                                alert_flow.socket_tcp.send(encode_message(metric, value))
+                                alert_flow.socket_tcp.send(encode_message(metric, value) + b'\n')
                             elif value >= metric_threshold and metric == 'ram_usage':
-                                alert_flow.socket_tcp.send(encode_message(metric, value))
+                                alert_flow.socket_tcp.send(encode_message(metric, value) + b'\n')
                             elif value >= metric_threshold and metric == 'packet_loss':
-                                alert_flow.socket_tcp.send(encode_message(metric, value))
+                                alert_flow.socket_tcp.send(encode_message(metric, value) + b'\n')
                             elif value >= metric_threshold and metric == 'jitter':
-                                alert_flow.socket_tcp.send(encode_message(metric, value))
+                                alert_flow.socket_tcp.send(encode_message(metric, value) + b'\n')
                         else:
                             if metric == 'interface_stats':
                                 for _, stats in value.items():
                                     eth_bytes_sent = stats['bytes_sent']
                                     eth_bytes_recv = stats['bytes_recv']
                                     if eth_bytes_sent >= metric_threshold:
-                                        alert_flow.socket_tcp.send(encode_message(metric, str(int(eth_bytes_sent))))
+                                        alert_flow.socket_tcp.send(encode_message(metric, str(int(eth_bytes_sent))) + b'\n')
                                     if eth_bytes_recv >= metric_threshold:
-                                        alert_flow.socket_tcp.send(encode_message(metric, str(int(eth_bytes_recv))))
+                                        alert_flow.socket_tcp.send(encode_message(metric, str(int(eth_bytes_recv))) + b'\n')
                 # Tell server that the task was completed and agent is ready for more tasks
                 net_task.socket_udp.sendto(encode_message(AGENT_READY_COMMAND), s_addr)
 

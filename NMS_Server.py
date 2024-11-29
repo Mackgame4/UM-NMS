@@ -5,6 +5,7 @@ from task import TaskManager
 import socket
 import threading
 import sys
+import json
 
 class NMS_Server:
     def __init__(self, host='127.0.0.1', port=8888, config_file="data/configure.json"):
@@ -25,14 +26,21 @@ class NMS_Server:
             conn, addr = alert_flow.socket_tcp.accept()
             with conn:
                 notify("info", f"AlertFlow Client connected at {addr}")
+                buffer = ""
                 while True:
                     data = conn.recv(MAX_BUFFER_SIZE)
                     if not data:
                         break
-                    message = decode_message(data)
-                    metric_name = message.command
-                    metric_data = message.data
-                    notify_af("warning", f"{metric_name} condition got exceeded: {metric_data}")
+                    buffer += data.decode('utf-8')  # Accumulate incoming data
+                    while '\n' in buffer:  # Process each complete message
+                        raw_message, buffer = buffer.split('\n', 1)
+                        try:
+                            message = decode_message(raw_message.encode('utf-8'))
+                            metric_name = message.command
+                            metric_data = message.data
+                            notify_af("warning", f"{metric_name} condition got exceeded: {metric_data}")
+                        except json.JSONDecodeError as e:
+                            notify("error", f"Failed to decode message: {e}")
 
     ### NetTask methods (Server-side) ###
     def start_net_task(self):
@@ -104,8 +112,8 @@ def main(args):
     net_task_thread = threading.Thread(target=server.start_net_task)
     alert_thread.start()
     net_task_thread.start()
-    #alert_thread.join()
-    #net_task_thread.join()
+    alert_thread.join()
+    net_task_thread.join()
 
 if __name__ == "__main__":
     args = sys.argv[1:]
