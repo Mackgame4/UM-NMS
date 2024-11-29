@@ -67,7 +67,7 @@ class NMS_Agent:
                 task_device = message.data['device']
                 notify_nt("info", f"Received task: {task_id} with frequency {task_frequency}")
                 # Send task confirmation to the server
-                net_task.socket_udp.sendto(encode_message(TASK_REQUEST_CONFIRM_COMMAND, task_id), s_addr)
+                #net_task.socket_udp.sendto(encode_message(TASK_REQUEST_CONFIRM_COMMAND, task_id), s_addr)
                 # Run task and send the result back to the server
                 result = self.run_task(task_id, task_frequency, task_device)
                 net_task.socket_udp.sendto(encode_message(TASK_RESULT_COMMAND, result), s_addr)
@@ -96,6 +96,8 @@ class NMS_Agent:
                                         alert_flow.socket_tcp.send(encode_message(metric, str(int(eth_bytes_sent))) + b'\n')
                                     if eth_bytes_recv >= metric_threshold:
                                         alert_flow.socket_tcp.send(encode_message(metric, str(int(eth_bytes_recv))) + b'\n')
+                # Instead of sending the confirmation when it receives the taks, send when its done, this way of the agent disconnects, the task will still be in the server and it will re send it once it reconnects
+                net_task.socket_udp.sendto(encode_message(TASK_REQUEST_CONFIRM_COMMAND, task_id), s_addr)
                 # Tell server that the task was completed and agent is ready for more tasks
                 net_task.socket_udp.sendto(encode_message(AGENT_READY_COMMAND), s_addr)
 
