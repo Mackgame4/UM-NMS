@@ -1,4 +1,4 @@
-from protocols import MAX_BUFFER_SIZE, AGENT_REGISTER_COMMAND, AGENT_RECEIVED_COMMAND, TASK_REQUEST_COMMAND, TASK_RESULT_COMMAND, AGENT_READY_COMMAND, NetTask as NT, AlertFlow as AF
+from protocols import MAX_BUFFER_SIZE, AGENT_REGISTER_COMMAND, AGENT_RECEIVED_COMMAND, TASK_REQUEST_COMMAND, TASK_REQUEST_CONFIRM_COMMAND, TASK_RESULT_COMMAND, AGENT_READY_COMMAND, NetTask as NT, AlertFlow as AF
 from encoder import decode_message, encode_message
 from notify import notify, notify_nt, notify_af
 import socket
@@ -66,11 +66,11 @@ class NMS_Agent:
                 task_frequency = message.data['frequency']
                 task_device = message.data['device']
                 notify_nt("info", f"Received task: {task_id} with frequency {task_frequency}")
+                # Send task confirmation to the server
+                net_task.socket_udp.sendto(encode_message(TASK_REQUEST_CONFIRM_COMMAND, task_id), s_addr)
                 # Run task and send the result back to the server
                 result = self.run_task(task_id, task_frequency, task_device)
                 net_task.socket_udp.sendto(encode_message(TASK_RESULT_COMMAND, result), s_addr)
-                # Tell server that the task was completed and agent is ready for more tasks
-                #net_task.socket_udp.sendto(encode_message(AGENT_READY_COMMAND), s_addr)
                 # After sending the result to server, check if theres any values out of the normal range and send an alert in alert_flow
                 alert_flow = self.alert_flow
                 for metric, value in result.items():
@@ -89,13 +89,15 @@ class NMS_Agent:
                                 alert_flow.socket_tcp.send(encode_message(metric, value))
                         else:
                             if metric == 'interface_stats':
-                                for eth, stats in value.items():
+                                for _, stats in value.items():
                                     eth_bytes_sent = stats['bytes_sent']
                                     eth_bytes_recv = stats['bytes_recv']
                                     if eth_bytes_sent >= metric_threshold:
                                         alert_flow.socket_tcp.send(encode_message(metric, str(int(eth_bytes_sent))))
                                     if eth_bytes_recv >= metric_threshold:
                                         alert_flow.socket_tcp.send(encode_message(metric, str(int(eth_bytes_recv))))
+                # Tell server that the task was completed and agent is ready for more tasks
+                net_task.socket_udp.sendto(encode_message(AGENT_READY_COMMAND), s_addr)
 
 ### Runnable Section ###
 def main(args):

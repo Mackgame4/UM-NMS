@@ -48,5 +48,55 @@
                 "jitter": 100
             }
         }]
+    },
+    {
+        "task_id": "task-002",
+        "frequency": 4,
+        "devices": [{
+            "device_addr": "127.0.0.1",
+            "device_metrics": {
+                "cpu_usage": true,
+                "ram_usage": true,
+                "interface_stats": ["Ethernet", "Wi-Fi", "eth0"]
+            },
+            "link_metrics": {
+                "bandwidth": {
+                    "tool": "iperf",
+                    "role": "client",
+                    "server_address": "192.168.1.1",
+                    "duration": 10,
+                    "transport": "tcp",
+                    "frequency": 3
+                },
+                "jitter": {
+                    "tool": "iperf",
+                    "role": "client",
+                    "server_address": "192.168.1.1",
+                    "duration": 10,
+                    "transport": "udp",
+                    "frequency": 3
+                },
+                "packet_loss": {
+                    "tool": "iperf",
+                    "role": "client",
+                    "server_address": "192.168.1.1",
+                    "duration": 10,
+                    "frequency": 3
+                },
+                "latency": {
+                    "tool": "ping",
+                    "destination": "192.168.1.1",
+                    "packet_count": 5,
+                    "frequency": 3
+                }
+            },
+            "alertflow_conditions": {
+                "cpu_usage": 80,
+                "ram_usage": 90,
+                "interface_stats": 2000,
+                "packet_loss": 5,
+                "jitter": 100
+            }
+        }]
     }]
 }

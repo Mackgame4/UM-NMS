@@ -1,4 +1,4 @@
-from protocols import MAX_BUFFER_SIZE, AGENT_REGISTER_COMMAND, AGENT_RECEIVED_COMMAND, TASK_REQUEST_COMMAND, TASK_RESULT_COMMAND, AGENT_READY_COMMAND, NetTask as NT, AlertFlow as AF
+from protocols import MAX_BUFFER_SIZE, AGENT_REGISTER_COMMAND, AGENT_RECEIVED_COMMAND, TASK_REQUEST_COMMAND, TASK_REQUEST_CONFIRM_COMMAND, TASK_RESULT_COMMAND, AGENT_READY_COMMAND, NetTask as NT, AlertFlow as AF
 from encoder import decode_message, encode_message
 from notify import notify, notify_af
 from task import TaskManager
@@ -64,10 +64,22 @@ class NMS_Server:
                 notify("warning", f"Agent {agent_id} is ready to receive tasks")
                 # Check if there are tasks for the agent and send them to be ran
                 for task in task_manager.tasks:
+                    task_assigned = False  # Add a flag to track if a task has been assigned
                     for device in task['devices']:
                         if c_addr[0] == device['device_addr']:
                             net_task.socket_udp.sendto(encode_message(TASK_REQUEST_COMMAND, {"task_id": task['task_id'], "frequency": task['frequency'], "device": device}), c_addr)
                             notify("info", f"Sent task {task['task_id']} to Agent {agent_id}")
+                            task_assigned = True  # Set the flag to True
+                            break  # Break the inner loop
+                    if task_assigned:  # If a task has been assigned, exit the outer loop
+                        break # this brak is to avoid sendind two tasks to the same agent at the same time in (theres no colision avoidance control, im sorry ;-;)
+
+            # Comment this part of code if we want to run the task more times than the frequency defined in the task
+            elif message.command == TASK_REQUEST_CONFIRM_COMMAND:
+                notify("info", f"Agent {agent_id} confirmed task request")
+                # Remove the task from the list of tasks
+                task_manager.remove_task(message.data)
+                notify("debug", f"Remaining Tasks: {task_manager.tasks}")
 
             elif message.command == TASK_RESULT_COMMAND:
                 result = message.data
@@ -92,8 +104,8 @@ def main(args):
     net_task_thread = threading.Thread(target=server.start_net_task)
     alert_thread.start()
     net_task_thread.start()
-    alert_thread.join()
-    net_task_thread.join()
+    #alert_thread.join()
+    #net_task_thread.join()
 
 if __name__ == "__main__":
     args = sys.argv[1:]

@@ -6,6 +6,7 @@ AGENT_REGISTER_COMMAND = "register_agent"
 AGENT_RECEIVED_COMMAND = "agent_received"
 AGENT_READY_COMMAND = "agent_ready"
 TASK_REQUEST_COMMAND = "request_task"
+TASK_REQUEST_CONFIRM_COMMAND = "task_request_confirm"
 TASK_RESULT_COMMAND = "task_result"
 
 # NetTask (utilizando UDP) para a comunicação de tarefas e a coleta contínua de métricas
