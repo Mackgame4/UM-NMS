@@ -2,10 +2,12 @@ from protocols import MAX_BUFFER_SIZE, AGENT_REGISTER_COMMAND, AGENT_RECEIVED_CO
 from encoder import decode_message, encode_message
 from notify import notify, notify_af
 from task import TaskManager
+from file_manager import saveAsJson
 import socket
 import threading
 import sys
 import json
+import time
 
 class NMS_Server:
     def __init__(self, host='127.0.0.1', port=8888, config_file="data/configure.json"):
@@ -91,6 +93,9 @@ class NMS_Server:
 
             elif message.command == TASK_RESULT_COMMAND:
                 result = message.data
+                if result:
+                    unix_time = int(time.time())
+                    saveAsJson(f"data/output/{agent_id}_task_results_{unix_time}.json", result)
                 notify("success", f"Task result from Agent {agent_id}: {result}")
 
 ### Runnable Section ###

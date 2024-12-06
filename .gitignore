@@ -120,3 +120,6 @@ __pypackages__/
 
 # Windows Thumbnail cache files
 Thumbs.db
+
+# Output files
+data/output/*.json
